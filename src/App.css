@@ -1,0 +1,37 @@
+@import '~spectre.css/dist/spectre.css';
+@import '~spectre.css/dist/spectre-icons.css';
+@import '~spectre.css/dist/spectre-exp.css';
+
+.panel .panel-body {
+  overflow-y: visible;
+}
+
+.form-group {
+  align-items: center;
+}
+
+.slider.tooltip:not([data-tooltip])::after {
+  content: attr(data-formatted-value);
+  width: 60px;
+  text-align: center;
+}
+
+.slider.tooltip:not([data-tooltip])[disabled]::after {
+  display: none;
+}
+
+.btn:disabled {
+  pointer-events: auto;
+  cursor: not-allowed;
+  opacity: 1;
+  border-color: #e7e9ed;
+  color: #e7e9ed;
+}
+
+.btn:disabled:hover {
+  background: transparent;
+}
+
+.form-label.disabled {
+  color: #e7e9ed;
+}
