@@ -1,62 +1,66 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import logo from '../images/logo.png'
-import SettingsPane from './SettingsPane'
 import PresetImages from './PresetImages'
 import styled from 'styled-components'
 import ContainerDimensions from 'react-container-dimensions'
+import Dropzone from 'react-dropzone'
+import { readAsDataURL } from 'promise-file-reader'
+import { loadNewImage } from '../actions/imageActions'
 
 const ColorImage = styled.img`
   max-width: 100%;
 `
 
-const emptyState = () => (
-  <div className="empty">
-    <div className="empty-icon">
-      <i className="icon icon-3x icon-photo"></i>
-    </div>
-    <p className="empty-title h5">Upload a picture</p>
-    <p className="empty-subtitle">Drag and drop or select a file.</p>
-    <div className="empty-action">
-      <button className="btn btn-primary">Browse...</button>
-    </div>
-  </div>
-)
+class UploadPrompt extends Component {
+  handleDrop = files => {
+    readAsDataURL(files[0]).then(dataUrl => {
+      this.props.dispatch(loadNewImage(dataUrl))
+    })
+  }
 
-const sketchedState = (url, originalUrl, width) => (
-  <div className="comparison-slider">
-    <figure className="comparison-before">
-      <ColorImage src={ url } maxHeight={ width * 0.75 } />
-    </figure>
+  sketchedState = () => {
+    const { width, height } = this.props.image
 
-    <figure className="comparison-after">
-      <ColorImage src={ originalUrl } maxHeight={ width * 0.75 } />
-      <textarea className="comparison-resizer" readonly></textarea>
-    </figure>
-  </div>
-)
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', borderBottom: '1px solid #eee', boxShadow: '0px 2px 11px -5px' }} >
+        <div className="comparison-slider" style={{ width, height }}>
+          <figure className="comparison-before">
+            <ColorImage src={ this.props.image.url } />
+          </figure>
 
-const UploadPrompt = props => {
-  return (
-    <div className="container grid-lg">
-      <div style={ { margin: '30px auto'} }>
-        <img src={ logo } height='50' />
-      </div>
-      <div className="columns">
-        <div className="column col-6" style={{ 'minHeight': '476px' }}>
-          <ContainerDimensions>
-            { 
-              ({ width }) => {
-                return (props.image.url ? <ColorImage src={ props.image.url } maxHeight={ width * 0.75 } /> : emptyState())
-              }
-            }
-          </ContainerDimensions>
-          <PresetImages />
+          { this.props.image.sketched && (
+            <figure className="comparison-after">
+              <ColorImage src={ this.props.image.originalUrl } />
+              <textarea className="comparison-resizer" readOnly></textarea>
+            </figure>) }
         </div>
-        <SettingsPane />
       </div>
-    </div>
+    )
+  }
+
+  emptyState = () => (
+    <Dropzone onDrop={ this.handleDrop } style={{ border: 'solid 1px transparent' }} acceptStyle={{ border: 'solid 1px #32b643' }} multiple={ false }>
+      <div className="empty">
+        <div className="empty-icon">
+          <i className="icon icon-3x icon-photo"></i>
+        </div>
+        <p className="empty-title h5">Upload a picture</p>
+        <p className="empty-subtitle">Drag and drop or select a file.</p>
+        <div className="empty-action">
+          <button className="btn btn-primary">Browse...</button>
+        </div>
+      </div>
+    </Dropzone>
   )
+
+  render() {
+    return (
+      <div className="column col-6">
+        { this.props.image.url ? this.sketchedState() : this.emptyState() }
+        <PresetImages />
+      </div>
+    )
+  }
 }
 
 export default connect(({ image }) => ({ image }))(UploadPrompt)

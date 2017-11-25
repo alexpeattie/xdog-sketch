@@ -35,3 +35,15 @@
 .form-label.disabled {
   color: #e7e9ed;
 }
+
+.comparison-slider .comparison-after::after {
+  color: transparent;
+}
+
+.comparison-slider:hover .comparison-after::after {
+  color: #fff;
+}
+
+.col-ml-auto {
+  width: calc(50% - 20px);
+}

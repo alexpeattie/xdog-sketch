@@ -3,9 +3,11 @@ import { connect } from 'react-redux'
 import { reduxForm, formValueSelector } from 'redux-form'
 import Slider from './Slider'
 import Checkbox from './Checkbox'
+import cx from 'classnames'
 
 let SettingsForm = props => {
-  const { handleSubmit, XDoGEnabled } = props
+  const { handleSubmit, XDoGEnabled, rerendering } = props
+  const btnClasses = cx('btn', 'btn-block', { loading: rerendering })
 
   return (
     <form className="form-horizontal" onSubmit={ handleSubmit }>
@@ -18,7 +20,7 @@ let SettingsForm = props => {
       <Slider name='scale' label='Scale (p)' min={ 1 } max={ 100 } step= { 0.1 } disabled={ !XDoGEnabled } />
       <Slider name='phi' label='Phi' min={ 0.005 } max={ 0.1 } step= { 0.005 } disabled={ !XDoGEnabled } />
       <Slider name='epsilon' label='Epsilon' min={ 1 } max={ 200 } step= { 0.1 } disabled={ !XDoGEnabled } />
-      <button className="btn btn-block" type='submit'>Sketch It!</button>
+      <button className={ btnClasses } type='submit'>Sketch It!</button>
     </form>
   )
 }
@@ -41,7 +43,8 @@ SettingsForm = reduxForm({
 const selector = formValueSelector('imageSettings')
 SettingsForm = connect(state => {
   return {
-    XDoGEnabled: selector(state, 'XDoG')
+    XDoGEnabled: selector(state, 'XDoG'),
+    rerendering: state.image.rerendering
   }
 })(SettingsForm)
 
