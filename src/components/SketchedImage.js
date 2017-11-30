@@ -5,7 +5,7 @@ const ImageContainer = styled.div`
   display: flex;
   justify-content: center;
   border-bottom: 1px solid #eee;
-  box-shadow: 0px 2px 11px -5px
+  box-shadow: 0px 2px 11px -5px;
 `
 
 const Image = styled.img`

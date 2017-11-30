@@ -4,14 +4,14 @@ import numeral from 'numeral'
 import cx from 'classnames'
 
 const renderSlider = props => {
-  const { min, max, step, disabled, name } = props
-  const format = name === 'phi' ? '0.000' : '0.00'
+  const { min, max, step, disabled } = props
+  const format = props.format || '0.00'
 
   return field => (<input {...field.input} className='slider tooltip' type='range' min={ min } max={ max } step={ step } data-formatted-value={ numeral(field.input.value).format(format) } disabled={ disabled } />)
 }
 
 const Slider = props => {
-  const { min, max, step, name, label, disabled } = props
+  const { min, max, step, name, label, disabled, format } = props
   const labelClass = cx('form-label', { disabled })
 
   return (
@@ -22,7 +22,7 @@ const Slider = props => {
         </label>
       </div>
       <div className="col-9">
-        <Field name={ name } component={ renderSlider({ min, max, step, disabled, name }) } />
+        <Field name={ name } component={ renderSlider({ min, max, step, disabled, format }) } />
       </div>
     </div>
   )

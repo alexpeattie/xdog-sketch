@@ -78,3 +78,27 @@ label {
   background: #e7e9ed;
   border-color: #e7e9ed;
 }
+
+.modal-body h5 {
+  margin: 2rem 0 1rem;
+}
+
+.modal.modal-lg .modal-overlay {
+  background: rgba(248, 249, 250, .75);
+}
+
+.modal.modal-lg .modal-container {
+  box-shadow: 0px 2px 11px -5px;
+}
+
+.modal-overlay, .btn-clear {
+  font-size: 0;
+}
+
+.btn.btn-clear::before {
+  font-size: 16px;
+}
+
+body.modal-open {
+  overflow-y: hidden;
+}

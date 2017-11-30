@@ -35,16 +35,19 @@ export function DoGFilter(pixels, options) {
   const math = options.gpuAccelerated ? (new NDArrayMathGPU()) : (new NDArrayMathCPU())
   const grayscale = convertToGrayscale(pixels)
 
-  const { sigmaOne, sigmaTwo } = options
+  const { sigmaOne, sigmaTwo, threshold } = options
 
   return new Promise((resolve, reject) => {
     const original = Array3D.new([...grayscale.shape, 1], grayscale.data)
 
     const [kernelOne, kernelTwo] = [guassianKernel(sigmaOne), guassianKernel(sigmaTwo)]
     const [imgA, imgB] = [applyConvolution(math, original, kernelOne), applyConvolution(math, original, kernelTwo)]
-    
+
     const diff = math.subtract(imgA, imgB)
-    const result = math.add(s(255), math.multiply(s(-1), diff))
+    const diffPositive = math.subtract(diff, math.min(diff))
+    const relativeDiff = math.divide(diffPositive, math.max(diffPositive))
+
+    const result = math.multiply(math.step(math.subtract(relativeDiff, s(threshold))), s(255))
 
     result.data().then(sketchPixels => {
       const pixelArray = ndarray(sketchPixels, grayscale.shape)
@@ -66,17 +69,17 @@ export function XDoGFilter(pixels, options) {
 
   return new Promise((resolve, reject) => {
     const original = Array3D.new([...grayscale.shape, 1], grayscale.data)
-    const { sigmaOne, sigmaTwo, scale, epsilon, phi } = options
+    const rescaled = math.divide(original, s(255))
+    const { sigmaOne, sigmaTwo, sharpen, epsilon, phi } = options
 
     const [kernelOne, kernelTwo] = [guassianKernel(sigmaOne), guassianKernel(sigmaTwo)]
-    const [imgA, imgB] = [applyConvolution(math, original, kernelOne), applyConvolution(math, original, kernelTwo)]
+    const [imgA, imgB] = [applyConvolution(math, rescaled, kernelOne), applyConvolution(math, rescaled, kernelTwo)]
 
-    const scaledDiff = math.subtract(math.multiply(s(scale + 1), imgA), math.multiply(s(scale), imgB))
-    const sharpened = math.multiply(original, scaledDiff)
+    const scaledDiff = math.subtract(math.multiply(s(sharpen + 1), imgA), math.multiply(s(sharpen), imgB))
+    const sharpened = math.multiply(math.multiply(rescaled, scaledDiff), s(255))
 
     sharpened.data().then(sharpenedData => {
       const sharpenedPixels = ndarray(sharpenedData, sharpenedData.shape)
-      console.log(sharpenedPixels.data)
       const mask = Array3D.new(original.shape, gtseq(sharpenedPixels, epsilon).data)
       const inverseMask = math.add(math.multiply(mask, s(-1)), s(1))
 

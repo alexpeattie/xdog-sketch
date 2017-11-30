@@ -34,8 +34,9 @@ const ImageButtons = props => {
         { options.XDoG ? 'XDoG' : 'DoG' },
         σ<sub>1</sub> = { options.sigmaOne },
         σ<sub>2</sub> = { options.sigmaTwo }<br />
+        { options.XDoG && <span>t = { options.luminance }</span> }
         { options.XDoG && 
-          <span>p = { options.scale }, φ = { options.phi }, ε = { options.epsilon }</span>
+          <span>p = { options.sharpen }, φ = { options.phi }, ε = { options.epsilon }</span>
         }
       </Parameters> : <Parameters>{ filename }</Parameters> }
       <div>

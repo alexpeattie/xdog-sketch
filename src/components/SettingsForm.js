@@ -5,19 +5,20 @@ import Slider from './Slider'
 import Checkbox from './Checkbox'
 
 let SettingsForm = props => {
-  const { handleSubmit, XDoGEnabled } = props
+  const { handleSubmit, XDoGEnabled, sigmaRatio } = props
 
   return (
     <form className="form-horizontal" onSubmit={ handleSubmit }>
       <Slider name='sigmaOne' label='Sigma 1' min={ 0.01 } max={ 10 } step= { 0.01 } />
       <Slider name='sigmaTwo' label='Sigma 2' min={ 0.01 } max={ 10 } step= { 0.01 } className='is-error' />
-      { false && <p className="form-input-hint">Warning: setting σ<sub>1</sub> > σ<sub>2</sub> can yield odd-looking results.</p> }
+      { sigmaRatio < 1 && <p className="form-input-hint">Warning: setting σ<sub>1</sub> > σ<sub>2</sub> can yield odd-looking results.</p> }
+      <Slider name='threshold' label='Threshold' min={ 0.005 } max={ 0.75 } step= { 0.001 } format='0.0%' disabled={ XDoGEnabled } />
 
       <Checkbox name='gpuAccelerated' label='GPU Acceleration' />
       <Checkbox name='XDoG' label='eXtended Difference of Gaussians' />
 
-      <Slider name='scale' label='Scale (p)' min={ 1 } max={ 100 } step= { 0.1 } disabled={ !XDoGEnabled } />
-      <Slider name='phi' label='Phi' min={ 0.005 } max={ 0.1 } step= { 0.005 } disabled={ !XDoGEnabled } />
+      <Slider name='sharpen' label='Sharpen (p)' min={ 1 } max={ 100 } step= { 0.1 } disabled={ !XDoGEnabled } />
+      <Slider name='phi' label='Phi' min={ 0.005 } max={ 5 } step= { 0.001 } format='0.000' disabled={ !XDoGEnabled } />
       <Slider name='epsilon' label='Epsilon' min={ 1 } max={ 200 } step= { 0.1 } disabled={ !XDoGEnabled } />
     </form>
   )
@@ -26,11 +27,12 @@ let SettingsForm = props => {
 const initialValues = {
   sigmaOne: 1,
   sigmaTwo: 1.8,
+  threshold: 0.4,
   gpuAccelerated: true,
   XDoG: true,
-  scale: 35,
-  phi: 0.02,
-  epsilon: 80
+  sharpen: 35,
+  phi: 0.1,
+  epsilon: 20
 }
 
 SettingsForm = reduxForm({
@@ -41,7 +43,8 @@ SettingsForm = reduxForm({
 const selector = formValueSelector('imageSettings')
 SettingsForm = connect(state => {
   return {
-    XDoGEnabled: selector(state, 'XDoG')
+    XDoGEnabled: selector(state, 'XDoG'),
+    sigmaRatio: selector(state, 'sigmaTwo') / selector(state, 'sigmaOne')
   }
 })(SettingsForm)
 

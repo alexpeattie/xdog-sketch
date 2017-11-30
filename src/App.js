@@ -4,6 +4,7 @@ import Header from './components/Header'
 import ImagePane from './components/ImagePane'
 import SettingsPane from './components/SettingsPane'
 import BrowserWarning from './components/BrowserWarning'
+import AboutModal from './components/AboutModal'
 import './App.css';
 import store from './store'
 
@@ -20,7 +21,7 @@ class App extends Component {
               <ImagePane />
               <SettingsPane />
             </div>
-            {/* <AboutModal /> */}
+            <AboutModal /> 
           </div>
         </div>
       </Provider>
