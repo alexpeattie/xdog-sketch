@@ -5,11 +5,11 @@
   "dependencies": {
     "basename": "^0.1.2",
     "classnames": "^2.2.5",
+    "cwise": "^1.0.10",
     "deeplearn": "^0.3.11",
     "detect-browser": "^2.0.0",
     "gaussian-convolution-kernel": "^1.0.0",
     "get-pixels": "^3.3.0",
-    "luminance": "^1.0.3",
     "ndarray": "^1.0.18",
     "ndarray-resample": "^1.0.1",
     "numeral": "^2.0.6",

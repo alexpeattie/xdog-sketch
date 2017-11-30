@@ -1776,7 +1776,7 @@ cwise-parser@^1.0.0:
     esprima "^1.0.3"
     uniq "^1.0.0"
 
-cwise@^1.0.0, cwise@^1.0.4, cwise@^1.0.7:
+cwise@^1.0.10, cwise@^1.0.4, cwise@^1.0.7:
   version "1.0.10"
   resolved "https://registry.yarnpkg.com/cwise/-/cwise-1.0.10.tgz#24eee6072ebdfd6b8c6f5dadb17090b649b12bef"
   dependencies:
@@ -4198,13 +4198,6 @@ lru-cache@^4.0.1:
   dependencies:
     pseudomap "^1.0.2"
     yallist "^2.1.2"
-
-luminance@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/luminance/-/luminance-1.0.3.tgz#01dba5a6a0ace3163f272012127e2d3fae1f9e68"
-  dependencies:
-    cwise "^1.0.0"
-    ndarray "^1.0.13"
 
 macaddress@^0.2.8:
   version "0.2.8"
