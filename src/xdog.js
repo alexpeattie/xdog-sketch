@@ -2,24 +2,21 @@ import { Array3D, Array4D, NDArrayMathCPU, NDArrayMathGPU, Scalar } from 'deeple
 import generateGuassianKernel from 'gaussian-convolution-kernel'
 import streamToPromise from 'stream-to-promise'
 import zeros from 'zeros'
-import cwise from 'cwise'
 import savePixels from 'save-pixels'
 import ndarray from 'ndarray'
-import { gtseq } from 'ndarray-ops'
+import { gtseq, assign, mulseq, addeq } from 'ndarray-ops'
 
 function convertToGrayscale(pixels) {
-  // Adapted from https://github.com/scijs/luminance/blob/master/lum.js
-
   const [width, height, ...rest] = pixels.shape // eslint-disable-line no-unused-vars
-  const computeLuminance = cwise({
-    args: ["array", "array", "array", "array"],
-    body(out, r, g, b) {
-      out = 0.299 * r + 0.587 * g + 0.114 * b
-    }
-  })
-
   let grayscale = zeros([width, height], pixels.dtype)
-  computeLuminance(grayscale, pixels.pick(null, null, 0), pixels.pick(null, null, 1), pixels.pick(null, null, 2))
+
+  const channelWeights = [0.299, 0.587, 0.114]
+  for (const n of [0, 1, 2]) {
+    let channel = zeros([width, height], pixels.dtype)
+    assign(channel, pixels.pick(null, null, n))
+    mulseq(channel, channelWeights[n])
+    addeq(grayscale, channel)
+  }
 
   return grayscale
 }
