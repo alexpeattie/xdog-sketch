@@ -1,10 +1,10 @@
 import getPixels from 'get-pixels'
-import lenna from '../images/lenna.png'
 import { DoGFilter, XDoGFilter } from '../xdog'
 
 export const UPDATE_IMAGE_URL = 'UPDATE_IMAGE_URL'
 export const UPDATE_SOURCE_PIXELS = 'UPDATE_SOURCE_PIXELS'
 export const RERENDERING = 'RERENDERING'
+export const CLEAR_IMAGE = 'CLEAR_IMAGE'
 
 function updateImageUrl(payload, newImage) {
   if(newImage) payload.originalUrl = payload.url
@@ -28,10 +28,16 @@ function rerendering() {
   }
 }
 
-export function loadNewImage(url) {
+export function clearImage() {
+  return {
+    type: CLEAR_IMAGE
+  }
+}
+
+export function loadNewImage(url, filename = '') {
   return dispatch => {
     getPixels(url, (err, pixels) => {
-      let [width, height, ...rest] = pixels.shape
+      let [width, height, ...rest] = pixels.shape // eslint-disable-line no-unused-vars
       const scaleFactor = Math.min(470 / width, 600 / height)
 
       if(scaleFactor < 1) {
@@ -39,7 +45,7 @@ export function loadNewImage(url) {
         height = height * scaleFactor
       }
 
-      dispatch(updateImageUrl({ url, width, height }, true))
+      dispatch(updateImageUrl({ url, width, height, filename }, true))
       dispatch(updateSourcePixels({ pixels }))
     })
   }
@@ -52,7 +58,7 @@ export function sketchify(options) {
     const filterFn = options.XDoG ? XDoGFilter : DoGFilter
 
     filterFn(pixels, options).then(url => {
-      dispatch(updateImageUrl({ url, sketched: true }))
+      dispatch(updateImageUrl({ url, sketched: true, options }))
     })
   }
 }

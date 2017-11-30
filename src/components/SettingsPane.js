@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import SettingsForm from './SettingsForm'
+import SketchItButton from './SketchItButton'
 import { sketchify } from '../actions/imageActions'
+import cx from 'classnames'
 
 class SettingsPane extends Component {
   submitSettings = settings => {
@@ -15,8 +17,10 @@ class SettingsPane extends Component {
   }
 
   render() {
+    const disabled = !this.props.image.url
+
     return (
-      <div className="panel column col-6 col-ml-auto">
+      <div className={ cx('panel column col-6 col-ml-auto', { disabled }) }>
         <div className="panel-header">
           <div className="panel-title">
             <strong>Image Settings</strong>
@@ -26,11 +30,11 @@ class SettingsPane extends Component {
           <SettingsForm onSubmit={ this.submitSettings } />
         </div>
         <div className="panel-footer">
-          {/*<button className="btn btn-block" disabled>Sketch It!</button>*/}
+          <SketchItButton />
         </div>
       </div>
     )
   }
 }
 
-export default connect()(SettingsPane)
+export default connect(({ image }) => ({ image }))(SettingsPane)

@@ -2,6 +2,28 @@
 @import '~spectre.css/dist/spectre-icons.css';
 @import '~spectre.css/dist/spectre-exp.css';
 
+.outer-container {
+  overflow-x: scroll;
+}
+
+.container {
+  margin-bottom: 2rem;
+  min-width: 1000px;
+}
+
+.panel {
+  transition: opacity 0.5s ease;
+}
+
+.panel.disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.panel.disabled * {
+  pointer-events: none;
+}
+
 .panel .panel-body {
   overflow-y: visible;
 }
@@ -45,5 +67,14 @@
 }
 
 .col-ml-auto {
-  width: calc(50% - 20px);
+  width: calc(50% - 1rem);
+}
+
+label {
+  cursor: pointer;
+}
+
+.disabled .slider::-webkit-slider-thumb, .disabled .form-switch input:checked + .form-icon {
+  background: #e7e9ed;
+  border-color: #e7e9ed;
 }

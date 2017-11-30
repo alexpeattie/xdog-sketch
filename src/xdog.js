@@ -8,7 +8,7 @@ import ndarray from 'ndarray'
 import { gtseq } from 'ndarray-ops'
 
 function convertToGrayscale(pixels) {
-  const [width, height, ...rest] = pixels.shape
+  const [width, height, ...rest] = pixels.shape // eslint-disable-line no-unused-vars
 
   let grayscale = zeros([width, height], pixels.dtype)
   return luminance(grayscale, pixels)
@@ -76,7 +76,7 @@ export function XDoGFilter(pixels, options) {
 
     sharpened.data().then(sharpenedData => {
       const sharpenedPixels = ndarray(sharpenedData, sharpenedData.shape)
-
+      console.log(sharpenedPixels.data)
       const mask = Array3D.new(original.shape, gtseq(sharpenedPixels, epsilon).data)
       const inverseMask = math.add(math.multiply(mask, s(-1)), s(1))
 

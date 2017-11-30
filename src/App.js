@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { Provider } from 'react-redux'
 import Header from './components/Header'
-import UploadPrompt from './components/UploadPrompt'
+import ImagePane from './components/ImagePane'
 import SettingsPane from './components/SettingsPane'
+import BrowserWarning from './components/BrowserWarning'
 import './App.css';
 import store from './store'
 
@@ -10,11 +11,16 @@ class App extends Component {
   render() {
     return (
       <Provider store={ store }>
-        <div className="container grid-lg">
-          <Header />
-          <div className="columns">
-            <UploadPrompt />
-            <SettingsPane />
+        <div className='outer-container'>
+          <BrowserWarning />
+
+          <div className="container grid-lg">
+            <Header />
+            <div className="columns">
+              <ImagePane />
+              <SettingsPane />
+            </div>
+            {/* <AboutModal /> */}
           </div>
         </div>
       </Provider>

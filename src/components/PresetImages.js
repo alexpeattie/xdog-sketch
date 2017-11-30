@@ -2,9 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import styled, { css } from 'styled-components'
 import bugatti from '../images/bugatti.jpg'
-import lenna from '../images/lenna.png'
-import baboon from '../images/baboon.png'
-import logo from '../images/logo.png'
+import lenna from '../images/lenna.jpg'
+import baboon from '../images/baboon.jpg'
 import headscarf from '../images/headscarf.jpg'
 import peppers from '../images/peppers.jpg'
 import { loadNewImage } from '../actions/imageActions'
@@ -33,21 +32,28 @@ const Presets = styled.div`
   align-items: center;
 `
 
+const Prompt = styled.p`
+  margin-bottom: 0.4rem;
+  font-size: 14px;
+`
+
 const PresetImages = props => {
-  const selectPreset = url => {
-    props.dispatch(loadNewImage(url))
+  const selectPreset = (url, filename) => {
+    props.dispatch(loadNewImage(url, filename))
   }
 
-  return (<Presets>
-    <p>Or choose a preset...</p>
-    <div>
-      <Thumb alt='Preset image: Peppers' src={ peppers } onClick={ () => selectPreset(peppers) } />
-      <Thumb alt='Preset image: Headscarf' src={ headscarf } onClick={ () => selectPreset(headscarf) } />
-      <Thumb alt='Preset image: Lenna' src={ lenna } onClick={ () => selectPreset(lenna) } />
-      <Thumb alt='Preset image: Baboon' src={ baboon } onClick={ () => selectPreset(baboon) } />
-      <Thumb alt='Preset image: Bugatti' src={ bugatti } onClick={ () => selectPreset(bugatti) } last />
-    </div>
-  </Presets>)
+  return (
+    <Presets>
+      <Prompt>Or choose a preset...</Prompt>
+      <div>
+        <Thumb alt='Preset image: Peppers' src={ peppers } onClick={ () => selectPreset(peppers, 'peppers.jpg') } />
+        <Thumb alt='Preset image: Headscarf' src={ headscarf } onClick={ () => selectPreset(headscarf, 'headscarf.jpg') } />
+        <Thumb alt='Preset image: Lenna' src={ lenna } onClick={ () => selectPreset(lenna, 'lenna.jpg') } />
+        <Thumb alt='Preset image: Baboon' src={ baboon } onClick={ () => selectPreset(baboon, 'baboon.jpg') } />
+        <Thumb alt='Preset image: Bugatti' src={ bugatti } onClick={ () => selectPreset(bugatti, 'bugatti.jpg') } last />
+      </div>
+    </Presets>
+  )
 }
 
 export default connect()(PresetImages)
