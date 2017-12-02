@@ -11,7 +11,6 @@ let SettingsForm = props => {
     <form className="form-horizontal" onSubmit={ handleSubmit }>
       <Slider name='sigmaOne' label='Sigma 1' min={ 0.01 } max={ 10 } step= { 0.01 } />
       <Slider name='sigmaTwo' label='Sigma 2' min={ 0.01 } max={ 10 } step= { 0.01 } className='is-error' />
-      { sigmaRatio < 1 && <p className="form-input-hint">Warning: setting σ<sub>1</sub> > σ<sub>2</sub> can yield odd-looking results.</p> }
       <Slider name='threshold' label='Threshold' min={ 0.005 } max={ 0.75 } step= { 0.001 } format='0.0%' disabled={ XDoGEnabled } />
 
       <Checkbox name='gpuAccelerated' label='GPU Acceleration' />
@@ -43,8 +42,7 @@ SettingsForm = reduxForm({
 const selector = formValueSelector('imageSettings')
 SettingsForm = connect(state => {
   return {
-    XDoGEnabled: selector(state, 'XDoG'),
-    sigmaRatio: selector(state, 'sigmaTwo') / selector(state, 'sigmaOne')
+    XDoGEnabled: selector(state, 'XDoG')
   }
 })(SettingsForm)
 

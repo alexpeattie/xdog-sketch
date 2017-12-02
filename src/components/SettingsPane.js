@@ -4,6 +4,14 @@ import SettingsForm from './SettingsForm'
 import SketchItButton from './SketchItButton'
 import { sketchify } from '../actions/imageActions'
 import cx from 'classnames'
+import styled from 'styled-components'
+import { formValueSelector } from 'redux-form'
+
+const SigmaWarning = styled.p`
+  color: #e85600;
+  font-size: .7rem;
+  margin-top: .2rem;
+`
 
 class SettingsPane extends Component {
   submitSettings = settings => {
@@ -28,6 +36,9 @@ class SettingsPane extends Component {
         </div>
         <div className="panel-body">
           <SettingsForm onSubmit={ this.submitSettings } />
+          { this.props.sigmaRatio < 1 && (
+            <SigmaWarning>Warning: setting σ<sub>1</sub> > σ<sub>2</sub> can yield odd-looking results.</SigmaWarning>
+          ) }
         </div>
         <div className="panel-footer">
           <SketchItButton />
@@ -37,4 +48,10 @@ class SettingsPane extends Component {
   }
 }
 
-export default connect(({ image }) => ({ image }))(SettingsPane)
+const selector = formValueSelector('imageSettings')
+export default connect(state => {
+  return {
+    sigmaRatio: selector(state, 'sigmaTwo') / selector(state, 'sigmaOne'),
+    image: state.image
+  }
+})(SettingsPane)

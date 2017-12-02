@@ -10,7 +10,6 @@
     "gaussian-convolution-kernel": "^1.0.0",
     "get-pixels": "^3.3.0",
     "ndarray": "^1.0.18",
-    "ndarray-resample": "^1.0.1",
     "numeral": "^2.0.6",
     "promise-file-reader": "^1.0.0",
     "react": "^16.1.1",
