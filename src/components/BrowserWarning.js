@@ -15,7 +15,6 @@ const Warning = styled.div`
 
 const BrowserWarning = props => {
   const { name, version } = (detect() || {})
-  console.log(name, version)
   const isRecentChrome = (name === 'chrome' && parseFloat(version) > 50)
 
   return !isRecentChrome && (<Warning>

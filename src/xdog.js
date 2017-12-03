@@ -4,7 +4,7 @@ import streamToPromise from 'stream-to-promise'
 import zeros from 'zeros'
 import savePixels from 'save-pixels'
 import ndarray from 'ndarray'
-import { gtseq, assign, mulseq, addeq } from 'ndarray-ops'
+import { assign, mulseq, addeq } from 'ndarray-ops'
 
 function convertToGrayscale(pixels) {
   const [width, height, ...rest] = pixels.shape // eslint-disable-line no-unused-vars
@@ -84,21 +84,18 @@ export function XDoGFilter(pixels, options) {
 
     const scaledDiff = math.subtract(math.multiply(s(sharpen + 1), imgA), math.multiply(s(sharpen), imgB))
     const sharpened = math.multiply(math.multiply(rescaled, scaledDiff), s(255))
+    const mask = math.step(math.subtract(math.multiply(rescaled, scaledDiff), s(epsilon)))
+    const inverseMask = math.add(math.multiply(mask, s(-1)), s(1))
 
-    sharpened.data().then(sharpenedData => {
-      const sharpenedPixels = ndarray(sharpenedData, sharpenedData.shape)
-      const mask = Array3D.new(original.shape, gtseq(sharpenedPixels, epsilon).data)
-      const inverseMask = math.add(math.multiply(mask, s(-1)), s(1))
+    const softThresholded = math.add(s(1), softThreshold(math, sharpened, phi, epsilon))
+    const result = math.multiply(math.add(mask, math.multiply(inverseMask, softThresholded)), s(255))
+    const resultScaled = math.multiply(math.divide(result, math.max(result)), s(255))
 
-      const softThresholded = math.add(s(1), softThreshold(math, sharpened, phi, epsilon))
-      const result = math.multiply(math.add(mask, math.multiply(inverseMask, softThresholded)), s(255))
-
-      result.data().then(sketchPixels => {
-        const pixelArray = ndarray(sketchPixels, grayscale.shape)
-        streamToPromise(savePixels(pixelArray, 'png')).then(buffer => {
-          const image = 'data:image/png;base64,' + buffer.toString('base64')
-          resolve(image)
-        })
+    resultScaled.data().then(sketchPixels => {
+      const pixelArray = ndarray(sketchPixels, grayscale.shape)
+      streamToPromise(savePixels(pixelArray, 'png')).then(buffer => {
+        const image = 'data:image/png;base64,' + buffer.toString('base64')
+        resolve(image)
       })
     })
   })

@@ -5,7 +5,7 @@ import Slider from './Slider'
 import Checkbox from './Checkbox'
 
 let SettingsForm = props => {
-  const { handleSubmit, XDoGEnabled, sigmaRatio } = props
+  const { handleSubmit, XDoGEnabled } = props
 
   return (
     <form className="form-horizontal" onSubmit={ handleSubmit }>
@@ -17,7 +17,7 @@ let SettingsForm = props => {
       <Checkbox name='XDoG' label='eXtended Difference of Gaussians' />
 
       <Slider name='sharpen' label='Sharpen (p)' min={ 1 } max={ 100 } step= { 0.1 } disabled={ !XDoGEnabled } />
-      <Slider name='phi' label='Phi' min={ 0.005 } max={ 5 } step= { 0.001 } format='0.000' disabled={ !XDoGEnabled } />
+      <Slider name='phi' label='Phi' min={ 0.005 } max={ 2 } step= { 0.001 } format='0.000' disabled={ !XDoGEnabled } />
       <Slider name='epsilon' label='Epsilon' min={ 1 } max={ 200 } step= { 0.1 } disabled={ !XDoGEnabled } />
     </form>
   )
@@ -42,7 +42,7 @@ SettingsForm = reduxForm({
 const selector = formValueSelector('imageSettings')
 SettingsForm = connect(state => {
   return {
-    XDoGEnabled: selector(state, 'XDoG')
+    XDoGEnabled: selector(state, 'XDoG'),
   }
 })(SettingsForm)
 
