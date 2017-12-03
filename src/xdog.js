@@ -1,24 +1,23 @@
 import { Array3D, Array4D, NDArrayMathCPU, NDArrayMathGPU, Scalar } from 'deeplearn'
 import generateGuassianKernel from 'gaussian-convolution-kernel'
 import streamToPromise from 'stream-to-promise'
-import zeros from 'zeros'
 import savePixels from 'save-pixels'
 import ndarray from 'ndarray'
-import { assign, mulseq, addeq } from 'ndarray-ops'
 
-function convertToGrayscale(pixels) {
-  const [width, height, ...rest] = pixels.shape // eslint-disable-line no-unused-vars
-  let grayscale = zeros([width, height], pixels.dtype)
+// Convenience method for initializing scalars
+const s = n => Scalar.new(n)
 
-  const channelWeights = [0.299, 0.587, 0.114]
-  for (const n of [0, 1, 2]) {
-    let channel = zeros([width, height], pixels.dtype)
-    assign(channel, pixels.pick(null, null, n))
-    mulseq(channel, channelWeights[n])
-    addeq(grayscale, channel)
-  }
+export function convertToGrayscale(pixels) {
+  const math = window.WebGLRenderingContext ? new NDArrayMathGPU() : new NDArrayMathCPU()
+  const [width, height, channels] = pixels.shape
 
-  return grayscale
+  const color = math.transpose(Array3D.new([height, width, channels], pixels.data), [1, 0, 2]).reshape(pixels.shape)
+
+  const r = math.multiply(math.slice3D(color, [0, 0, 0], [width, height, 1]), s(0.299))
+  const g = math.multiply(math.slice3D(color, [0, 0, 1], [width, height, 1]), s(0.587))
+  const b = math.multiply(math.slice3D(color, [0, 0, 2], [width, height, 1]), s(0.114))
+
+  return math.add(r, math.add(g, b)).data()
 }
 
 function calculateKernelSize(sigma) {
@@ -34,18 +33,12 @@ function applyConvolution(math, original, kernel) {
   return math.conv2d(original, kernel, null, 1, 'same')
 }
 
-// Convenience method for initializing scalars
-const s = n => Scalar.new(n)
-
-export function DoGFilter(pixels, options) {
-  console.log(options.gpuAccelerated)
-  const math = options.gpuAccelerated ? (new NDArrayMathGPU()) : (new NDArrayMathCPU())
-  const grayscale = convertToGrayscale(pixels)
-
-  const { sigmaOne, sigmaTwo, threshold } = options
+export function DoGFilter(pixels, options, shape) {
+  const { sigmaOne, sigmaTwo, threshold, gpuAccelerated } = options
+  const math = gpuAccelerated ? (new NDArrayMathGPU()) : (new NDArrayMathCPU())
 
   return new Promise((resolve, reject) => {
-    const original = Array3D.new([...grayscale.shape, 1], grayscale.data)
+    const original = Array3D.new([...shape, 1], pixels)
 
     const [kernelOne, kernelTwo] = [guassianKernel(sigmaOne), guassianKernel(sigmaTwo)]
     const [imgA, imgB] = [applyConvolution(math, original, kernelOne), applyConvolution(math, original, kernelTwo)]
@@ -57,7 +50,7 @@ export function DoGFilter(pixels, options) {
     const result = math.multiply(math.step(math.subtract(relativeDiff, s(threshold))), s(255))
 
     result.data().then(sketchPixels => {
-      const pixelArray = ndarray(sketchPixels, grayscale.shape)
+      const pixelArray = ndarray(sketchPixels, shape)
       streamToPromise(savePixels(pixelArray, 'png')).then(buffer => {
         const image = 'data:image/png;base64,' + buffer.toString('base64')
         resolve(image)
@@ -70,14 +63,13 @@ function softThreshold(math, pixels, phi, epsilon) {
   return math.tanh(math.multiply(s(phi), math.subtract(pixels, s(epsilon))))
 }
 
-export function XDoGFilter(pixels, options) {
-  const math = options.gpuAccelerated ? (new NDArrayMathGPU()) : (new NDArrayMathCPU())
-  const grayscale = convertToGrayscale(pixels)
+export function XDoGFilter(pixels, options, shape) {
+  const { sigmaOne, sigmaTwo, sharpen, epsilon, phi, gpuAccelerated } = options
+  const math = gpuAccelerated ? (new NDArrayMathGPU()) : (new NDArrayMathCPU())
 
   return new Promise((resolve, reject) => {
-    const original = Array3D.new([...grayscale.shape, 1], grayscale.data)
+    const original = Array3D.new([...shape, 1], pixels)
     const rescaled = math.divide(original, s(255))
-    const { sigmaOne, sigmaTwo, sharpen, epsilon, phi } = options
 
     const [kernelOne, kernelTwo] = [guassianKernel(sigmaOne), guassianKernel(sigmaTwo)]
     const [imgA, imgB] = [applyConvolution(math, rescaled, kernelOne), applyConvolution(math, rescaled, kernelTwo)]
@@ -92,7 +84,7 @@ export function XDoGFilter(pixels, options) {
     const resultScaled = math.multiply(math.divide(result, math.max(result)), s(255))
 
     resultScaled.data().then(sketchPixels => {
-      const pixelArray = ndarray(sketchPixels, grayscale.shape)
+      const pixelArray = ndarray(sketchPixels, shape)
       streamToPromise(savePixels(pixelArray, 'png')).then(buffer => {
         const image = 'data:image/png;base64,' + buffer.toString('base64')
         resolve(image)

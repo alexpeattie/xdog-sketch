@@ -1,10 +1,11 @@
 import getPixels from 'get-pixels'
-import { DoGFilter, XDoGFilter } from '../xdog'
+import { DoGFilter, XDoGFilter, convertToGrayscale } from '../xdog'
 
 export const UPDATE_IMAGE_URL = 'UPDATE_IMAGE_URL'
 export const UPDATE_SOURCE_PIXELS = 'UPDATE_SOURCE_PIXELS'
-export const RERENDERING = 'RERENDERING'
+export const LOAD_NEW_IMAGE_PENDING = 'LOAD_NEW_IMAGE_PENDING'
 export const CLEAR_IMAGE = 'CLEAR_IMAGE'
+export const RERENDERING = 'RERENDERING'
 
 function updateImageUrl(payload, newImage) {
   if(newImage) payload.originalUrl = payload.url
@@ -34,19 +35,30 @@ export function clearImage() {
   }
 }
 
+function loadNewImagePending() {
+  return {
+    type: LOAD_NEW_IMAGE_PENDING
+  }
+}
+
 export function loadNewImage(url, filename = '') {
   return dispatch => {
-    getPixels(url, (err, pixels) => {
-      let [width, height, ...rest] = pixels.shape // eslint-disable-line no-unused-vars
+    dispatch(loadNewImagePending())
+    getPixels(url, (err, colorPixels) => {
+      const [originalWidth, originalHeight, ...rest] = colorPixels.shape // eslint-disable-line no-unused-vars
+      let [width, height] = [originalWidth, originalHeight]
       const scaleFactor = Math.min(470 / width, 600 / height)
 
       if(scaleFactor < 1) {
-        width = width * scaleFactor
-        height = height * scaleFactor
+        width = originalWidth * scaleFactor
+        height = originalHeight * scaleFactor
       }
 
-      dispatch(updateImageUrl({ url, width, height, filename }, true))
-      dispatch(updateSourcePixels({ pixels }))
+      dispatch(updateImageUrl({ url, width, height, originalWidth, originalHeight, filename }, true))
+
+      convertToGrayscale(colorPixels).then(pixels => {
+        dispatch(updateSourcePixels({ pixels }))
+      })
     })
   }
 }
@@ -54,10 +66,10 @@ export function loadNewImage(url, filename = '') {
 export function sketchify(options) {
   return (dispatch, getState) => {
     dispatch(rerendering())
-    const { pixels } = getState().image
+    const { pixels, originalWidth, originalHeight } = getState().image
     const filterFn = options.XDoG ? XDoGFilter : DoGFilter
 
-    filterFn(pixels, options).then(url => {
+    filterFn(pixels, options, [originalWidth, originalHeight]).then(url => {
       dispatch(updateImageUrl({ url, sketched: true, options }))
     })
   }

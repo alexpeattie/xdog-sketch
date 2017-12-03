@@ -32,10 +32,10 @@ class UploadZone extends Component {
 
     return (
       <Dropzone ref={(node) => { dropzoneRef = node }} onDrop={ this.handleDrop } multiple={ false } disableClick={ true } { ...theme }>
-        { React.cloneElement(this.props.children, { browse: this.browse }) }
+        { React.cloneElement(this.props.children, { browse: this.browse, loading: this.props.loading }) }
       </Dropzone>
     )
   }
 }
 
-export default connect()(UploadZone)
+export default connect(({ image }) => ({ loading: image.loading }))(UploadZone)
