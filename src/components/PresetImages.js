@@ -8,6 +8,14 @@ import headscarf from '../images/headscarf.jpg'
 import peppers from '../images/peppers.jpg'
 import { loadNewImage } from '../actions/imageActions'
 
+const FULL_SIZE = {
+  peppers: 'https://i.imgur.com/3rRblfO.jpg',
+  headscarf: 'https://i.imgur.com/eB8UNho.jpg',
+  baboon: 'https://i.imgur.com/332GZbX.jpg',
+  lenna: 'https://i.imgur.com/tWSRzVw.jpg',
+  bugatti: 'https://i.imgur.com/CjRP6ZI.jpg'
+}
+
 const Thumb = styled.img`
   max-height: 2rem;
   border-radius: 4px;
@@ -46,11 +54,11 @@ const PresetImages = props => {
     <Presets>
       <Prompt>Or choose a preset...</Prompt>
       <div>
-        <Thumb alt='Preset image: Peppers' src={ peppers } onClick={ () => selectPreset(peppers, 'peppers.jpg') } />
-        <Thumb alt='Preset image: Headscarf' src={ headscarf } onClick={ () => selectPreset(headscarf, 'headscarf.jpg') } />
-        <Thumb alt='Preset image: Lenna' src={ lenna } onClick={ () => selectPreset(lenna, 'lenna.jpg') } />
-        <Thumb alt='Preset image: Baboon' src={ baboon } onClick={ () => selectPreset(baboon, 'baboon.jpg') } />
-        <Thumb alt='Preset image: Bugatti' src={ bugatti } onClick={ () => selectPreset(bugatti, 'bugatti.jpg') } last />
+        <Thumb alt='Preset image: Peppers' src={ peppers } onClick={ () => selectPreset(FULL_SIZE.peppers, 'peppers.jpg') } />
+        <Thumb alt='Preset image: Headscarf' src={ headscarf } onClick={ () => selectPreset(FULL_SIZE.headscarf, 'headscarf.jpg') } />
+        <Thumb alt='Preset image: Lenna' src={ lenna } onClick={ () => selectPreset(FULL_SIZE.lenna, 'lenna.jpg') } />
+        <Thumb alt='Preset image: Baboon' src={ baboon } onClick={ () => selectPreset(FULL_SIZE.baboon, 'baboon.jpg') } />
+        <Thumb alt='Preset image: Bugatti' src={ bugatti } onClick={ () => selectPreset(FULL_SIZE.bugatti, 'bugatti.jpg') } last />
       </div>
     </Presets>
   )
